@@ -139,7 +139,6 @@ def publish_modbus_to_mqtt():
             data = execute_modbus_command("read", address=8, slave_id=vfd_details[device_id])
             if data['success'] is True:
                 amps = data.get("value")
-
                 send_value = {"deviceid":device_id,
                               "voltage":"250",
                               "current1":round(float(amps), 2),
@@ -153,7 +152,7 @@ def publish_modbus_to_mqtt():
                               }
 
                 mqtt_client.publish(MQTT_TOPIC.replace("*", device_id), json.dumps(send_value))
-                print(f"📡 Published Frequency {amps}Hz to {MQTT_TOPIC}")
+                print(f"📡 Published Frequency {amps}A to {MQTT_TOPIC}")
             else:
                 print(f"⚠️ Modbus Read Failed: {data.get('error')}")
         time.sleep(40)  # Wait 40 seconds before next read
