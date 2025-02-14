@@ -19,6 +19,7 @@ services:
     restart: always
     depends_on:
       - flask_app
+    privileged: true
     devices:
       - "/dev:/dev"
     volumes:
