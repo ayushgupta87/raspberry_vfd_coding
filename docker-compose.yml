@@ -11,6 +11,19 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
+
+  mqtt_publisher:
+    build: .
+    container_name: mqtt_publisher
+    restart: always
+    depends_on:
+      - flask_app
+    devices:
+      - "/dev:/dev"
+    volumes:
+      - .:/app
+    command: python mqtt_publisher.py
+
   nginx:
     image: nginx:latest
     container_name: nginx_proxy

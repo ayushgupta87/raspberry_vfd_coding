@@ -1,5 +1,5 @@
 import json
-import threading
+# import threading
 import time
 
 import serial.tools.list_ports
@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 API_KEY = "DJKnkdwjnkjNEKJWFNWJKNKJENKLJVnlKVNWLKVNWLEVJNLEJnvELJVNLKEVNLEKVNLKVENLKVN"
 
-modbus_lock = threading.Lock()
+# modbus_lock = threading.Lock()
 
 vfd_details = {
     "VFDNV1": 5,
@@ -48,38 +48,38 @@ usb_port = find_usb_port()
 
 def execute_modbus_command(action, address, slave_id, value=None):
     """ Helper function to create Modbus connection, execute, and close it """
-    with modbus_lock:
-        modbus_client = ModbusSerialClient(
-            port=usb_port,
-            baudrate=9600,
-            stopbits=1,
-            bytesize=8,
-            parity='N',
-            timeout=2,
-            framer=FramerType.RTU
-        )
 
-        if not modbus_client.connect():
-            return {"success": False, "error": "Failed to connect to Modbus device"}
+    modbus_client = ModbusSerialClient(
+        port=usb_port,
+        baudrate=9600,
+        stopbits=1,
+        bytesize=8,
+        parity='N',
+        timeout=2,
+        framer=FramerType.RTU
+    )
 
-        try:
-            if action == "read":
-                response = modbus_client.read_holding_registers(address=address, count=1, slave=slave_id)
-                if response.isError():
-                    return {"success": False, "details": str(response)}
-                return {"success": True, "value": response.registers[0]}
+    if not modbus_client.connect():
+        return {"success": False, "error": "Failed to connect to Modbus device"}
 
-            elif action == "write":
-                response = modbus_client.write_register(address=address, value=value, slave=slave_id)
-                if response.isError():
-                    return {"success": False, "details": str(response)}
-                return {"success": True, "written_value": value}
+    try:
+        if action == "read":
+            response = modbus_client.read_holding_registers(address=address, count=1, slave=slave_id)
+            if response.isError():
+                return {"success": False, "details": str(response)}
+            return {"success": True, "value": response.registers[0]}
 
-        except Exception as e:
-            return {"success": False, "error": str(e)}
+        elif action == "write":
+            response = modbus_client.write_register(address=address, value=value, slave=slave_id)
+            if response.isError():
+                return {"success": False, "details": str(response)}
+            return {"success": True, "written_value": value}
 
-        finally:
-            modbus_client.close()  # Close connection after execution
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+    finally:
+        modbus_client.close()  # Close connection after execution
 
 
 @app.route('/get_freq', methods=['GET'])
@@ -160,8 +160,8 @@ def publish_modbus_to_mqtt():
 
 if __name__ == '__main__':
 
-    mqtt_thread = threading.Thread(target=publish_modbus_to_mqtt, daemon=True)
-    mqtt_thread.start()
+    # mqtt_thread = threading.Thread(target=publish_modbus_to_mqtt, daemon=True)
+    # mqtt_thread.start()
 
     print("🔄 Starting Flask Modbus RTU API...")
     app.run(host='0.0.0.0', port=8000, debug=True)
