@@ -15,9 +15,9 @@ mqtt_client.username_pw_set("enlog_sensors", "KJNekjncsdbksjvbskjvbKJDNSFUEORfie
 mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
 
 vfd_details = {
-    "VFDNV1": 5,
-    "VFDNV2": 6,
-    "VFDNV3": 11
+    "VFDNONVEGEXH1": 5,
+    "VFDNONVEGEXH2": 6,
+    "VFDNONVEGFAH1": 11
 }
 
 def find_usb_port():
