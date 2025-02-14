@@ -1,3 +1,61 @@
 sudo docker-compose up --build -d
 
 docker compose up --build -d
+
+# update new code
+sudo systemctl restart flask_app
+sudo systemctl restart mqtt_publisher
+
+# check status
+sudo systemctl status flask_app
+sudo systemctl status mqtt_publisher
+
+# check logs
+sudo journalctl -u flask_app -f
+sudo journalctl -u mqtt_publisher -f
+
+# deployment
+1. API services
+
+sudo nano /etc/systemd/system/flask_app.service
+
+[Unit]
+Description=Flask API Service
+After=network.target
+
+[Service]
+User=ayushgupta
+WorkingDirectory=/home/ayushgupta/raspberry_vfd_coding
+ExecStart=/home/ayushgupta/raspberry_vfd_coding/venv/bin/gunicorn --bind 0.0.0.0:8080 --workers 4 app:app
+Restart=always
+KillMode=process
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
+
+2. Logging services
+
+sudo nano /etc/systemd/system/mqtt_publisher.service
+
+[Unit]
+Description=MQTT Publisher Service
+After=network.target
+
+[Service]
+User=ayushgupta
+WorkingDirectory=/home/ayushgupta/raspberry_vfd_coding
+ExecStart=/home/ayushgupta/raspberry_vfd_coding/venv/bin/python mqtt_publisher.py
+Restart=always
+KillMode=process
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
+
+#  Start & Enable Services
+sudo systemctl daemon-reload
+sudo systemctl enable flask_app
+sudo systemctl enable mqtt_publisher
+sudo systemctl start flask_app
+sudo systemctl start mqtt_publisher
