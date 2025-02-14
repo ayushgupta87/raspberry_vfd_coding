@@ -10,12 +10,14 @@ from pymodbus import FramerType
 
 app = Flask(__name__)
 
+API_KEY = "DJKnkdwjnkjNEKJWFNWJKNKJENKLJVnlKVNWLKVNWLEVJNLEJnvELJVNLKEVNLEKVNLKVENLKVN"
+
 modbus_lock = threading.Lock()
 
 vfd_details = {
     "VFDNV1": 5,
     "VFDNV2": 6,
-    "VFDNV3": 7
+    "VFDNV3": 11
 }
 
 
@@ -83,6 +85,11 @@ def execute_modbus_command(action, address, slave_id, value=None):
 @app.route('/get_freq', methods=['GET'])
 def get_frequency():
     device_id = request.args.get("device_id")
+    api_key = request.args.get("api_key")
+
+    if api_key != API_KEY:
+        return jsonify({'success': False, 'error': 'Auth Error'}), 422
+
     if device_id is None:
         return jsonify({'success': False, 'error': 'Device id not added'}), 422
     if device_id not in ['VFDNV1', 'VFDNV2', 'VFDNV3']:
@@ -101,6 +108,10 @@ def set_frequency():
         data = request.json
         freq_value = data.get("frequency")
         device_id = data.get("device_id")
+        api_key = data.get("api_key")
+
+        if api_key != API_KEY:
+            return jsonify({'success': False, 'error': 'Auth Error'}), 422
 
         if device_id is None:
             return jsonify({'success': False, 'error': 'Device id not added'}), 422
@@ -125,8 +136,7 @@ def home():
 def publish_modbus_to_mqtt():
     while True:
         for device_id in vfd_details.keys():
-            # data = execute_modbus_command("read", address=8, slave_id=vfd_details[device_id])
-            data = {'success': True, "value": 10}
+            data = execute_modbus_command("read", address=8, slave_id=vfd_details[device_id])
             if data['success'] is True:
                 amps = data.get("value")
 
@@ -139,7 +149,8 @@ def publish_modbus_to_mqtt():
                               "current5":"0.00",
                               "current6":"0.00",
                               "status":"111111",
-                              "freq":40,"data":"live"}
+                              "freq":40,"data":"live"
+                              }
 
                 mqtt_client.publish(MQTT_TOPIC.replace("*", device_id), json.dumps(send_value))
                 print(f"📡 Published Frequency {amps}Hz to {MQTT_TOPIC}")
