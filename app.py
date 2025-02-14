@@ -111,7 +111,8 @@ def set_frequency():
             return jsonify({"success": False, "error": "Invalid frequency value. Must be between 30-50 Hz"}), 422
 
         scaled_value = freq_value * 10
-        return jsonify(execute_modbus_command("write", address=1103, value=scaled_value, slave_id=vfd_details[device_id])), 200
+        data_execute = execute_modbus_command("write", address=1103, value=scaled_value, slave_id=vfd_details[device_id])
+        return jsonify({'success': True, "written_value": int(data_execute['written_value'])/10}), 200
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 422
