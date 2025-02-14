@@ -59,3 +59,14 @@ sudo systemctl enable flask_app
 sudo systemctl enable mqtt_publisher
 sudo systemctl start flask_app
 sudo systemctl start mqtt_publisher
+
+
+
+# logging in
+
+username: ayushgupta
+Password: hellocompass123
+
+ssh ayushgupta@0.tcp.in.ngrok.io -p 11135
+
+ayushcompass.local
