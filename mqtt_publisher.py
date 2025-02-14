@@ -76,7 +76,7 @@ def publish_modbus_to_mqtt():
                 print(f"📡 Published Frequency {amps}A to {MQTT_TOPIC}")
             else:
                 print(f"⚠️ Modbus Read Failed: {data.get('error')}")
-        time.sleep(40)
+        time.sleep(120)
 
 if __name__ == "__main__":
     print("🔄 Starting MQTT Publisher...")
