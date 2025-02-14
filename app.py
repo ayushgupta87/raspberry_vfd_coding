@@ -87,7 +87,7 @@ def get_frequency():
     data = execute_modbus_command("read", address=7, slave_id=vfd_details[device_id])
     if data['success'] is False:
         return jsonify(data), 422
-    return jsonify(data), 200
+    return jsonify({'success': True, "value": int(data['value'])/10}), 200
 
 
 @app.route('/set_freq', methods=['POST'])
