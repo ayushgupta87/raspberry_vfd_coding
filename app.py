@@ -81,7 +81,7 @@ def get_frequency():
 
     if device_id is None:
         return jsonify({'success': False, 'error': 'Device id not added'}), 422
-    if device_id not in ['VFDNV1', 'VFDNV2', 'VFDNV3']:
+    if device_id not in list(vfd_details.keys()):
         return jsonify({'success': False, 'error': 'Device id wrong'}), 422
 
     data = execute_modbus_command("read", address=7, slave_id=vfd_details[device_id])
@@ -104,7 +104,7 @@ def set_frequency():
 
         if device_id is None:
             return jsonify({'success': False, 'error': 'Device id not added'}), 422
-        if device_id not in ['VFDNV1', 'VFDNV2', 'VFDNV3']:
+        if device_id not in list(vfd_details.keys()):
             return jsonify({'success': False, 'error': 'Device id wrong'}), 422
 
         if not isinstance(freq_value, int) or not (0 <= freq_value <= 50):
