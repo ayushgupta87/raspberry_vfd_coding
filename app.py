@@ -21,32 +21,21 @@ vfd_details = {
 }
 
 
-# MQTT Configuration
-MQTT_BROKER = "epvi-emqx.in"  # Change to your MQTT broker
-MQTT_PORT = 1883
-
-MQTT_TOPIC = "publish/*"
-
-mqtt_client = mqtt.Client()
-mqtt_client.username_pw_set("enlog_sensors", "KJNekjncsdbksjvbskjvbKJDNSFUEORfiernlfljefnbkjBEKJVNEONVOEIVN")  # Set if authentication is required
-mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
-
-
 # Auto-detect RS485 USB port
 def find_usb_port():
     ports = serial.tools.list_ports.comports()
     for port in ports:
         print(f"Detected Port: {port.device} - {port.description}")
-        if "FT232" in port.description or "usbserial" in port.device or "USB" in port.device:
+        if "FT232" in port.description or "usbserial" in port.device or "USB" in port.device or "/dev/cu.usbserial" in port.device:
             print(f"✅ Using RS485 Adapter on: {port.device}")
             return port.device
 
     print("No USB-to-RS485 adapter found. Exiting.")
     return None  # Handle missing device properly
 
-usb_port = find_usb_port()
-
 def execute_modbus_command(action, address, slave_id, value=None):
+    usb_port = find_usb_port()
+    print(usb_port)
     """ Helper function to create Modbus connection, execute, and close it """
 
     modbus_client = ModbusSerialClient(
@@ -132,36 +121,7 @@ def set_frequency():
 def home():
     return jsonify({"status": "Modbus RTU Flask API is running!"}), 200
 
-
-def publish_modbus_to_mqtt():
-    while True:
-        for device_id in vfd_details.keys():
-            data = execute_modbus_command("read", address=8, slave_id=vfd_details[device_id])
-            if data['success'] is True:
-                amps = data.get("value")
-                send_value = {"deviceid":device_id,
-                              "voltage":"250",
-                              "current1":round(float(amps), 2),
-                              "current2":round(float(amps), 2),
-                              "current3":round(float(amps), 2),
-                              "current4":"0.00",
-                              "current5":"0.00",
-                              "current6":"0.00",
-                              "status":"111111",
-                              "freq":40,"data":"live"
-                              }
-
-                mqtt_client.publish(MQTT_TOPIC.replace("*", device_id), json.dumps(send_value))
-                print(f"📡 Published Frequency {amps}A to {MQTT_TOPIC}")
-            else:
-                print(f"⚠️ Modbus Read Failed: {data.get('error')}")
-        time.sleep(40)  # Wait 40 seconds before next read
-
-
 if __name__ == '__main__':
-
-    # mqtt_thread = threading.Thread(target=publish_modbus_to_mqtt, daemon=True)
-    # mqtt_thread.start()
 
     print("🔄 Starting Flask Modbus RTU API...")
     app.run(host='0.0.0.0', port=8080, debug=True)

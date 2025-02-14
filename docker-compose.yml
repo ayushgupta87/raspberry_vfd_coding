@@ -7,31 +7,32 @@ services:
     devices:
       - "/dev:/dev"
     ports:
-      - "8080:8080"
+      - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
-    command: gunicorn --bind 0.0.0.0:8080 --workers 4 app:app
 
 
-  mqtt_publisher:
-    build: .
-    container_name: mqtt_publisher
-    restart: always
-    depends_on:
-      - flask_app
-    privileged: true
-    devices:
-      - "/dev:/dev"
-    volumes:
-      - .:/app
-    command: python mqtt_publisher.py
-
-#  nginx:
-#    image: nginx:latest
-#    container_name: nginx_proxy
-#    volumes:
-#      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-#    ports:
-#      - "8080:80"
+#  mqtt_publisher:
+#    build: .
+#    container_name: mqtt_publisher
+#    restart: always
 #    depends_on:
 #      - flask_app
+#    privileged: true
+#    devices:
+#      - "/dev:/dev"
+#    volumes:
+#      - .:/app
+#    command: python mqtt_publisher.py
+#    environment:
+#      - PYTHONUNBUFFERED=1
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - flask_app

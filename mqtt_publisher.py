@@ -23,7 +23,7 @@ vfd_details = {
 def find_usb_port():
     ports = serial.tools.list_ports.comports()
     for port in ports:
-        if "FT232" in port.description or "usbserial" in port.device or "USB" in port.device:
+        if "FT232" in port.description or "usbserial" in port.device or "USB" in port.device or "/dev/cu.usbserial" in port.device:
             return port.device
     return None
 
@@ -63,9 +63,9 @@ def publish_modbus_to_mqtt():
                 amps = data["value"]
                 send_value = {"deviceid":device_id,
                               "voltage":"250",
-                              "current1":round(float(amps), 2),
-                              "current2":round(float(amps), 2),
-                              "current3":round(float(amps), 2),
+                              "current1":round(float(amps), 2)/10,
+                              "current2":round(float(amps), 2)/10,
+                              "current3":round(float(amps), 2)/10,
                               "current4":"0.00",
                               "current5":"0.00",
                               "current6":"0.00",
