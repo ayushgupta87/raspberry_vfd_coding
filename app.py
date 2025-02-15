@@ -12,7 +12,6 @@ app = Flask(__name__)
 
 API_KEY = "DJKnkdwjnkjNEKJWFNWJKNKJENKLJVnlKVNWLKVNWLEVJNLEJnvELJVNLKEVNLEKVNLKVENLKVN"
 
-# modbus_lock = threading.Lock()
 
 vfd_details = {
     "VFDNONVEGEXH1": 5,
