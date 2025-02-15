@@ -17,7 +17,7 @@ mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
 vfd_details = {
     "VFDNONVEGEXH1": 5,
     "VFDNONVEGEXH2": 6,
-    # "VFDNONVEGFAH1": 11
+    "VFDNONVEGFAH1": 11
 }
 
 def find_usb_port():
@@ -76,7 +76,7 @@ def publish_modbus_to_mqtt():
                 print(f"📡 Published Frequency {amps}A to {MQTT_TOPIC}")
             else:
                 print(f"⚠️ Modbus Read Failed: {data.get('error')}")
-        time.sleep(5)
+        time.sleep(60)
 
 if __name__ == "__main__":
     print("🔄 Starting MQTT Publisher...")
