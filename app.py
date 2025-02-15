@@ -1,10 +1,5 @@
-import json
-# import threading
-import time
-
 import serial.tools.list_ports
 from flask import Flask, request, jsonify
-import paho.mqtt.client as mqtt
 from pymodbus.client import ModbusSerialClient
 from pymodbus import FramerType
 
@@ -54,13 +49,13 @@ def execute_modbus_command(action, address, slave_id, value=None):
         if action == "read":
             response = modbus_client.read_holding_registers(address=address, count=1, slave=slave_id)
             if response.isError():
-                return {"success": False, "details": str(response)}
+                return {"success": False, "error": str(response)}
             return {"success": True, "value": response.registers[0]}
 
         elif action == "write":
             response = modbus_client.write_register(address=address, value=value, slave=slave_id)
             if response.isError():
-                return {"success": False, "details": str(response)}
+                return {"success": False, "error": str(response)}
             return {"success": True, "written_value": value}
 
     except Exception as e:
@@ -111,7 +106,9 @@ def set_frequency():
 
         scaled_value = freq_value * 10
         data_execute = execute_modbus_command("write", address=1103, value=scaled_value, slave_id=vfd_details[device_id])
-        return jsonify({'success': True, "written_value": int(data_execute['written_value'])/10}), 200
+        if data_execute['success'] is True:
+            return jsonify({'success': True, "written_value": int(data_execute['written_value'])/10}), 200
+        return jsonify({'success': False, "error": data_execute['error']}), 422
 
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 422
